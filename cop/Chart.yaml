@@ -1,0 +1,11 @@
+apiVersion: v1
+appVersion: "1.0"
+description: "神州信息云管平台"
+name: cop
+version: 0.1.0
+icon: https://sayaoailun.github.io/website/logo/COP/logo_cop__b@2x.png
+keywords:
+- cloud
+maintainers:
+- email: guojwe@dcits.com
+  name: 郭建伟

@@ -1,0 +1,12 @@
+dependencies:
+  - name: mysql
+    version: 1.6.2
+    repository: https://kubernetes-charts.storage.googleapis.com
+dependencies:
+  - name: redis
+    version: 10.6.0
+    repository: https://charts.bitnami.com/bitnami
+dependencies:
+  - name: nginx
+    version: 5.1.12
+    repository: https://charts.bitnami.com/bitnami

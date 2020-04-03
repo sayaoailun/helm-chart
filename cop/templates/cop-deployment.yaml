@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-cop
+  labels:
+    app: {{ .Release.Name }}-cop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-cop
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-cop
+    spec:
+      containers:
+      - name: cop
+        image: sayaoailun/cop:20190915
+        ports:
+        - containerPort: 8090
+          name: cop
+        volumeMounts:
+        - name: cop-config
+          mountPath: /smartcop/conf
+      volumes:
+      - name: cop-config
+        configMap:
+          name: {{ .Release.Name }}-cop

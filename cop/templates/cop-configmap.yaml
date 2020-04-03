@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-cop
+data:
+  application.properties: |-
+    server.context-path=/backend
+
+    server.port=8090
+    logging.level.tk.mybatis=TRACE
+    druid.url=jdbc:mysql://{{ .Release.Name }}-mysql:3306/{{ .Values.mysql.mysqlDatabase }}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+    druid.testurl=jdbc:mysql://{{ .Release.Name }}-mysql:3306/{{ .Values.mysql.mysqlDatabase }}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+    druid.driver-class=com.mysql.jdbc.Driver
+    druid.username=root
+    druid.password={{ .Values.mysql.mysqlRootPassword }}
+    druid.initial-size=1
+    druid.min-idle=10
+    druid.max-active=20
+    druid.test-on-borrow=true
+    spring.freemarker.cache=false
+    spring.freemarker.request-context-attribute=request
+    threadPool.keepAliveTime=2
+    threadPool.maximumPoolSize=10
+    threadPool.queueSize=20
+    ##########
+    deploy.enable=yes
+    deploy.baseurl=http://10.0.7.21:18083
+    deploy.zabbixServerIp=zabbixServerIp
+    deploy.sshPort=22
+    ######wuyu add
+    #spring.session.store-type=none
+    spring.session.store-type=redis
+    spring.redis.host={{ .Release.Name }}-redis-master
+    spring.redis.port=6379
+    restRequest.codedeployContext=http://10.0.7.21:9999/cloudui/
+    restRequest.codedeployClusterid=615a6762-2589-441f-89cc-4033cc7a91df
+    restRequest.cmpContext=http://10.0.7.21:9999/backend/
+    #DES.DESKey=a+y5XqcLH14=
+    res.smartCD.serverPath=/datafs/smartcop/
+    timertask.ip=127.0.0.1
+    ######end wuyu
+    #javamail
+    #spring.mail.host=smtp.163.com
+    #spring.mail.username=jingxiaodong16888@163.com
+    #spring.mail.password=7213087jxd
+    #spring.mail.protocol=smtp
+    #spring.mail.smtp.port=465
+    #spring.mail.default-encoding=UTF-8
+    #spring.mail.properties.mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory
+    #spring.mail.properties.mail.smtp.socketFactory.fallback=false
+    #spring.mail.properties.mail.smtp.socketFactory.port=465
+    #spring.mail.properties.mail.smtp.auth=true
+    #spring.mail.properties.mail.smtp.starttls.enable=true
+    #spring.mail.properties.mail.smtp.starttls.required=true
+
+    release.url=http://10.0.7.21:8090/backend/
+
+    #workflow
+    workflow.startWorkFlow = http://10.0.7.21:8091/frame/WFService/startPdByPidAndUsers.wf
+    workflow.executeWorkFlow = http://10.0.7.21:8091/frame/WFService/executeWorkitem.wf
+    workflow.getFirstTasks=http://10.0.7.21:8091/frame/WFService/getFirstTasksByPidAndVars.wf
+    workflow.getNextTasksListByTokenIdAndVars=http://10.0.7.21:8091/frame/WFService/getNextTasksListByTokenIdAndVars.wf
+    workflow.getFlowChartByPdId=http://10.0.7.21:8091/frame/WFService/getFlowChartByPdId.wf
+    workflow.getFlowChartByInstanceId=http://10.0.7.21:8091/frame/WFService/getFlowChartByInstanceId.wf
+    workflow.getWorkItemListByInstanceIdAndNodeId=http://10.0.7.21:8091/frame/WFService/getWorkItemListByInstanceIdAndNodeId.wf
+    workflow.getPdInfoByID=http://10.0.7.21:8091/frame/WFService/getPdInfoByID.wf
+    workflow.getInstanceInfoById=http://10.0.7.21:8091/frame/WFService/getInstanceInfoById.wf
+
+    monitor.zabbixUserName=Admin
+    monitor.zabbixPassword=zabbix
+    monitor.zabbixUrl=http://10.0.7.21/zabbix/api_jsonrpc.php
+    monitor.groupName=VMS
+    monitor.vmCpuWeight=0.2
+    monitor.vmMemoryWeight=0.8
+    monitor.hostCpuWeight=0.2
+    monitor.hostMemoryWeight=0.8
+
+    bm.sshUserName=root
+    bm.sshPassword=r00t
+    res.smartCOP.logoPath=/root/smartcop/logo/
+    sync.way=serial
+
+    vmware.diskModel=independent_persistent

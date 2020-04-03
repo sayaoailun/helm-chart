@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nginx.fullname" . }}
+  labels: {{- include "nginx.labels" . | nindent 4 }}
+data:
+  server-block.conf: |-
+    server {
+      listen 8081;
+      proxy_set_header Host $http_host;
+      location  ^~ /backend {
+        proxy_pass   http://{{ .Release.Name }}-cop:8090/backend;
+      }
+      location ^~ /backend/jxdSocket {
+        proxy_pass http://{{ .Release.Name }}-cop:8090/backend/jxdSocket;
+      }
+    }

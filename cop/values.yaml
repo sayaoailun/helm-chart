@@ -1,0 +1,12 @@
+mysql:
+  service:
+    type: NodePort
+  mysqlRootPassword: "mysql"
+  mysqlDatabase: "cloud"
+redis:
+  master:
+    service:
+      type: NodePort
+nginx:
+  service:
+    type: NodePort
