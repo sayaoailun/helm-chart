@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-cop
+spec:
+  template:
+    spec:
+      containers:
+      - name: cop-db-init
+        image: sayaoailun/cop-db-init:20190915
+        env:
+        - name: LC_ALL
+          value: C.UTF-8
+        - name: MYSQL_ROOT_PASSWORD
+          value: {{ .Values.mysql.mysqlRootPassword }}
+        - name: MYSQL_SERVER
+          value: {{ .Release.Name }}-mysql
+        - name: MYSQL_DATABASE
+          value: {{ .Values.mysql.mysqlDatabase }}
+      restartPolicy: Never
+  backoffLimit: 6
