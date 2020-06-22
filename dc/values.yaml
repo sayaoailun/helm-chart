@@ -1,0 +1,1012 @@
+mysql:
+  service:
+    type: NodePort
+  mysqlRootPassword: "mysql"
+  mysqlDatabase: "monitor"
+  initializationFiles:
+    db-init.sql: |-
+      DROP DATABASE IF EXISTS `monitor`;
+      CREATE DATABASE IF NOT EXISTS `monitor` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */;
+      USE `monitor`;
+      -- ----------------------------
+      -- Table structure for `accounts_info`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `accounts_info`;
+      CREATE TABLE `accounts_info` (
+        `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+        `USERID` varchar(50) NOT NULL,
+        `USERPASSWORD` varchar(64) DEFAULT NULL,
+        `TOKEN` varchar(100) DEFAULT NULL,
+        PRIMARY KEY (`ID`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of accounts_info
+      -- ----------------------------   admin/888888   dev/dev
+      INSERT INTO `accounts_info` VALUES ('1', 'admin', 'M0hn9rFM+RSrf8iOFvT9+5U1AcXah/ecrLo/Mg==', null);
+      INSERT INTO `accounts_info` VALUES ('2', 'dev', 'vSe3MxZI07010wQjm0bE+i7w85wpIruV5GQPNA==', null);
+
+      -- ----------------------------
+      -- Table structure for attribute
+      -- ----------------------------
+      DROP TABLE IF EXISTS `attribute`;
+      CREATE TABLE `attribute` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `uuid` varchar(256) COLLATE utf8_unicode_ci NOT NULL,
+        `jsondata` text COLLATE utf8_unicode_ci,
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uuid` (`uuid`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+      -- ----------------------------
+      -- Table structure for `ma_application`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `ma_application`;
+      CREATE TABLE `ma_application` (
+        `ID` bigint(22) NOT NULL AUTO_INCREMENT,
+        `APP_ID` varchar(50) DEFAULT NULL,
+        `DESCRIPTION` text,
+        `USERID` bigint(22) DEFAULT NULL,
+        `APP_TYPE` varchar(30) DEFAULT NULL,
+        `STATUS` varchar(20) DEFAULT NULL,
+        `DEPLOY_TIME` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        `APP_NAME` varchar(30) DEFAULT NULL,
+        `EXTEND_TYPE` bigint(22) DEFAULT NULL,
+        `DEPLOYABLE` char(1) DEFAULT '0',
+        `SCALABLE` tinyint(1) DEFAULT '0' COMMENT '1-scalable, 0-otherwise',
+        `UPGRADE_STATUS` varchar(20) DEFAULT 'END',
+        `IS_DOCKER_APP` tinyint(1) DEFAULT '0' COMMENT '是否是docker应用',
+        `THROUGH_ROUTER` tinyint(1) DEFAULT '1' COMMENT '调用时是否经过router',
+        `HAS_CONTEXT_PATH` tinyint(1) DEFAULT '1' COMMENT '是否包含上下文',
+        `AUTO_EXTEND` tinyint(4) NOT NULL DEFAULT '0',
+        `NET_MODEL` varchar(50) DEFAULT 'none',
+        PRIMARY KEY (`ID`),
+        UNIQUE KEY `PK_MA_APPLICATION` (`ID`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Table structure for `monitor_application`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_application`;
+      CREATE TABLE `monitor_application` (
+        `operstamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        `appId` varchar(10) DEFAULT NULL,
+        `cpu` varchar(8) DEFAULT NULL,
+        `mem` varchar(8) DEFAULT NULL,
+        `netIO` varchar(8) DEFAULT NULL,
+        `diskIO` varchar(8) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_application
+      -- ----------------------------
+
+      -- ----------------------------
+      -- Table structure for `monitor_category`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_category`;
+      CREATE TABLE `monitor_category` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `name` varchar(20) DEFAULT NULL,
+        `resourcetype` int(11) DEFAULT NULL,
+        `mtime` int(11) DEFAULT NULL,
+        `isrunning` int(11) DEFAULT NULL,
+        `userid` varchar(20) DEFAULT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=269 DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Table structure for `monitor_category_person`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_category_person`;
+      CREATE TABLE `monitor_category_person` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `category_id` int(11) DEFAULT NULL,
+        `person_id` int(11) DEFAULT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=783 DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Table structure for `monitor_category_resource`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_category_resource`;
+      CREATE TABLE `monitor_category_resource` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `category_id` int(11) DEFAULT NULL,
+        `resource_id` varchar(50) DEFAULT NULL,
+        `resource_name` varchar(50) DEFAULT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=647 DEFAULT CHARSET=utf8;
+
+
+      -- ----------------------------
+      -- Table structure for `monitor_category_rule`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_category_rule`;
+      CREATE TABLE `monitor_category_rule` (
+        `category_id` int(11) DEFAULT NULL,
+        `rule_id` int(11) DEFAULT NULL,
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=897 DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Table structure for `monitor_componentprobe`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_componentprobe`;
+      CREATE TABLE `monitor_componentprobe` (
+        `id` varchar(40) NOT NULL,
+        `userId` int(8) NOT NULL DEFAULT '0',
+        `name` varchar(20) DEFAULT 'paas',
+        `ip` varchar(20) DEFAULT '127.0.0.1',
+        `port` int(8) DEFAULT '65534',
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_componentprobe
+      -- ----------------------------
+
+      -- ----------------------------
+      -- Table structure for `monitor_container`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_container`;
+      CREATE TABLE `monitor_container` (
+        `operstamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        `containerId` varchar(50) DEFAULT NULL,
+        `cpu` varchar(20) DEFAULT NULL,
+        `mem` varchar(20) DEFAULT NULL,
+        `netInput` varchar(20) DEFAULT NULL,
+        `netOutput` varchar(20) DEFAULT NULL,
+        `diskInput` varchar(20) DEFAULT NULL,
+        `diskOutput` varchar(20) DEFAULT NULL,
+        `instanceId` varchar(50) DEFAULT NULL,
+        `appCpu` varchar(20) DEFAULT NULL,
+        `appMem` varchar(20) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_container
+      -- ----------------------------
+
+      -- ----------------------------
+      -- Table structure for `monitor_customresource`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_customresource`;
+      CREATE TABLE `monitor_customresource` (
+        `id` varchar(40) NOT NULL,
+        `userId` int(8) NOT NULL DEFAULT '0',
+        `name` varchar(20) DEFAULT 'default',
+        `description` varchar(400) DEFAULT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_customresource
+      -- ----------------------------
+
+      -- ----------------------------
+      -- Table structure for `monitor_history`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_history`;
+      CREATE TABLE `monitor_history` (
+        `operstamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        `id` varchar(100) DEFAULT NULL,
+        `userid` varchar(10) DEFAULT NULL,
+        `type` int(11) DEFAULT NULL,
+        `content` varchar(120) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Table structure for `monitor_metadata`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_metadata`;
+      CREATE TABLE `monitor_metadata` (
+        `id` int(11) DEFAULT NULL,
+        `name` varchar(20) DEFAULT NULL,
+        `type` int(11) DEFAULT NULL,
+        `sequence` varchar(15) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_metadata
+      -- ----------------------------
+      INSERT INTO `monitor_metadata` VALUES ('2', 'cpu_min', '1', '1-2');
+      INSERT INTO `monitor_metadata` VALUES ('3', 'cpu_max', '0', '0-3');
+      INSERT INTO `monitor_metadata` VALUES ('4', 'cpu_min', '0', '0-4');
+      INSERT INTO `monitor_metadata` VALUES ('5', 'mem_max', '1', '1-5');
+      INSERT INTO `monitor_metadata` VALUES ('6', 'mem_min', '1', '1-6');
+      INSERT INTO `monitor_metadata` VALUES ('7', 'mem_max', '0', '0-7');
+      INSERT INTO `monitor_metadata` VALUES ('8', 'mem_min', '0', '0-8');
+      INSERT INTO `monitor_metadata` VALUES ('1', 'cpu_max', '1', '1-1');
+      INSERT INTO `monitor_metadata` VALUES ('9', 'apprunningstate', '1', '1-9');
+      INSERT INTO `monitor_metadata` VALUES ('10', 'instancerunningstate', '1', '1-10');
+      INSERT INTO `monitor_metadata` VALUES ('11', 'hostrunningstate', '0', '0-11');
+      INSERT INTO `monitor_metadata` VALUES ('12', 'logscan', '1', '1-11');
+      INSERT INTO `monitor_metadata` VALUES ('13', 'accesstimes_min', '1', '1-12');
+      INSERT INTO `monitor_metadata` VALUES ('14', 'accesstimes_max', '1', '1-13');
+      INSERT INTO `monitor_metadata` VALUES ('15', 'componentwarn', '3', '3-14');
+      INSERT INTO `monitor_metadata` VALUES ('16', 'customresource', '4', '4-16');
+      INSERT INTO `monitor_metadata` VALUES ('17', 'exceptiontimes_max', '1', null);
+
+      -- ----------------------------
+      -- Table structure for `monitor_person`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_person`;
+      CREATE TABLE `monitor_person` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `name` varchar(10) DEFAULT NULL,
+        `type` varchar(10) DEFAULT NULL,
+        `value` varchar(30) DEFAULT NULL,
+        `userid` varchar(20) DEFAULT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=193 DEFAULT CHARSET=utf8;
+
+
+      -- ----------------------------
+      -- Table structure for `monitor_resource_type`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_resource_type`;
+      CREATE TABLE `monitor_resource_type` (
+        `id` int(11) DEFAULT NULL,
+        `name` varchar(15) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_resource_type
+      -- ----------------------------
+
+      -- ----------------------------
+      -- Table structure for `monitor_rule`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_rule`;
+      CREATE TABLE `monitor_rule` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `metadata_id` int(11) DEFAULT NULL,
+        `value` varchar(300) DEFAULT NULL,
+        `period` int(11) DEFAULT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=997 DEFAULT CHARSET=utf8;
+
+
+
+      -- ----------------------------
+      -- Table structure for `monitor_vm`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_vm`;
+      CREATE TABLE `monitor_vm` (
+        `operstamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        `vmId` varchar(50) DEFAULT NULL,
+        `cpu` varchar(8) DEFAULT NULL,
+        `mem` varchar(8) DEFAULT NULL,
+        `netIO` varchar(8) DEFAULT NULL,
+        `diskIO` varchar(8) DEFAULT NULL,
+        `netInput` varchar(8) DEFAULT NULL,
+        `netOutput` varchar(8) DEFAULT NULL,
+        `diskInput` varchar(8) DEFAULT NULL,
+        `diskOutput` varchar(8) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_vm
+      -- ----------------------------
+
+      -- ----------------------------
+      -- Table structure for `monitor_warn`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_warn`;
+      CREATE TABLE `monitor_warn` (
+        `name` varchar(50) NOT NULL DEFAULT '',
+        `warn_type` int(11) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_warn
+      -- ----------------------------
+
+      -- ----------------------------
+      -- Table structure for `monitor_warn_config`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_warn_config`;
+      CREATE TABLE `monitor_warn_config` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `config_type` int(11) DEFAULT NULL,
+        `probetime` int(11) DEFAULT NULL,
+        `warntime` int(11) DEFAULT NULL,
+        `warn_method` varchar(11) DEFAULT NULL,
+        `isrunning` int(11) DEFAULT '0',
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_warn_config
+      -- ----------------------------
+
+      -- ----------------------------
+      -- Table structure for `monitor_warn_person`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `monitor_warn_person`;
+      CREATE TABLE `monitor_warn_person` (
+        `name` varchar(30) DEFAULT NULL,
+        `role` varchar(20) DEFAULT NULL,
+        `warn_type` int(11) DEFAULT NULL,
+        `email` varchar(30) DEFAULT NULL,
+        `phone` varchar(12) DEFAULT NULL,
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of monitor_warn_person
+      -- ----------------------------
+
+      -- ----------------------------
+      -- Table structure for `my_application`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `my_application`;
+      CREATE TABLE `my_application` (
+        `ID` bigint(22) NOT NULL AUTO_INCREMENT,
+        `APP_ID` varchar(50) DEFAULT NULL,
+        `DESCRIPTION` text,
+        `USERID` bigint(22) DEFAULT NULL,
+        `APP_TYPE` varchar(30) DEFAULT NULL,
+        `STATUS` varchar(20) DEFAULT NULL,
+        `START_TIME` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        `APP_NAME` varchar(30) DEFAULT NULL,
+        PRIMARY KEY (`ID`),
+        UNIQUE KEY `PK_MA_APPLICATION` (`ID`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=191 DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Table structure for `policy_info`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `policy_info`;
+      CREATE TABLE `policy_info` (
+        `page_id` bigint(10) NOT NULL AUTO_INCREMENT,
+        `text` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+        `icon` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+        `sref` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+        `title` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+        `type` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+        `serialNum` bigint(10) NOT NULL,
+        PRIMARY KEY (`page_id`)
+      ) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
+
+      -- ----------------------------
+      -- Records of policy_info
+      -- ----------------------------
+      INSERT INTO `policy_info` VALUES ('1', '总览', 'icon-home', '/home', '总览', '', '0');
+      -- INSERT INTO `policy_info` VALUES ('2', 'IAAS接入管理', 'fa fa-sign-in', '/iaas', 'IAAS接入管理', 'iaas', '0');
+      INSERT INTO `policy_info` VALUES ('3', '权限管理', 'icon-shield', '/limit/user', '权限管理', 'limit', '0');
+      INSERT INTO `policy_info` VALUES ('4', '集群管理', 'icon-grid', '/listclusters', '我的集群', 'cluster', '0');
+      INSERT INTO `policy_info` VALUES ('5', '应用管理', 'fa fa-cube', '/listapps', '我的应用1', 'app', '0');
+      -- INSERT INTO `policy_info` VALUES ('6', '应用模板', 'icon-drawer', '/template/list', '应用模板', 'template', '0');
+      -- INSERT INTO `policy_info` VALUES ('7', '任务管理', 'fa fa-list-alt', '/listjobs', '我的任务', 'job', '0');
+      INSERT INTO `policy_info` VALUES ('8', '镜像仓库', 'fa fa-cubes', '/listimages', '镜像列表', 'image', '0');
+      -- INSERT INTO `policy_info` VALUES ('9', '持续集成', 'fa fa-download', '/integration', '持续集成', 'integration', '0');
+      INSERT INTO `policy_info` VALUES ('10', '监控告警', 'icon-speedometer', '/warningmonitor/tactics', '监控告警', 'warningmonitor', '0');
+      INSERT INTO `policy_info` VALUES ('11', '存储管理', 'fa fa-database', '/listpvcs/all', '存储管理', 'pvc', '0');
+      INSERT INTO `policy_info` VALUES ('12', '应用仓库', 'icon-repository', '/repository/management', '应用仓库', 'apprepository', '0');
+      INSERT INTO `policy_info` VALUES ('13', 'chart列表', 'icon-chartList', '/chart/management', 'chart列表', 'chartList', '0');
+      INSERT INTO `policy_info` VALUES ('15', '设置', 'icon-settings', '/settings/user', '设置', 'settings', '0');
+
+
+      -- ----------------------------
+      -- Table structure for `policy_menu`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `policy_menu`;
+      CREATE TABLE `policy_menu` (
+        `id` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+        `title` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+        `sref` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+      -- ----------------------------
+      -- Records of policy_menu
+      -- ----------------------------
+      INSERT INTO `policy_menu` VALUES ('10_1', '创建策略', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_10', '更新策略通知人', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_11', '删除策略通知人', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_12', '修改策略资源', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_13', '创建通知人', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_14', '更新通知人', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_15', '删除通知人', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_2', '编辑策略', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_3', '删除策略', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_4', '启动策略', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_5', '停止策略', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_6', '添加策略规则', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_7', '更新策略规则', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_8', '删除策略规则', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('10_9', '修改策略通知人', '监控告警');
+      INSERT INTO `policy_menu` VALUES ('2_1', 'IAAS删除', 'IAAS接入页面');
+      INSERT INTO `policy_menu` VALUES ('2_2', 'IAAS接入', 'IAAS接入页面');
+      INSERT INTO `policy_menu` VALUES ('2_3', 'IAAS更新', 'IAAS接入页面');
+      INSERT INTO `policy_menu` VALUES ('2_4', '加入集群', 'IAAS接入页面');
+      INSERT INTO `policy_menu` VALUES ('3_1', '新建用户', '权限页面');
+      INSERT INTO `policy_menu` VALUES ('3_2', '新建角色', '权限页面');
+      INSERT INTO `policy_menu` VALUES ('3_3', '删除角色', '权限页面');
+      INSERT INTO `policy_menu` VALUES ('3_4', '分配权限', '权限页面');
+      INSERT INTO `policy_menu` VALUES ('3_5', '新建菜单', '权限页面');
+      INSERT INTO `policy_menu` VALUES ('3_6', '删除菜单', '权限页面');
+      INSERT INTO `policy_menu` VALUES ('3_7', '编辑菜单', '权限页面');
+      INSERT INTO `policy_menu` VALUES ('3_8', '命名空间', '权限页面');
+      INSERT INTO `policy_menu` VALUES ('4_1', '新建集群', '集群管理');
+      INSERT INTO `policy_menu` VALUES ('4_2', '删除主机', '集群管理');
+      INSERT INTO `policy_menu` VALUES ('4_3', '添加主机', '集群管理');
+      INSERT INTO `policy_menu` VALUES ('4_4', '新建命名空间', '集群管理');
+      INSERT INTO `policy_menu` VALUES ('4_5', '删除命名空间', '集群管理');
+      INSERT INTO `policy_menu` VALUES ('4_6', '调度管理', '集群管理');
+      INSERT INTO `policy_menu` VALUES ('5_1', '创建应用', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_10', '删除实例', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_11', '添加端口映射', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_12', '删除端口映射', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_13', '添加域名', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_14', '删除域名', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_15', '添加存储', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_16', '删除存储', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_17', '更新负载配置', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_18', '添加自动伸缩', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_19', '删除自动伸缩', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_2', '删除应用', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_3', '升级/回滚', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_4', '实例数维护', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_5', '启动应用', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_6', '更新应用', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_7', '停止应用', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_8', '部署版本', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('5_9', '删除版本', '应用管理');
+      INSERT INTO `policy_menu` VALUES ('6_1', '创建模板', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('6_10', '新建编排', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('6_2', '部署私有模板', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('6_3', '删除私有模板', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('6_4', '部署模板', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('6_5', '删除模板', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('6_6', '已部署模板启动', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('6_7', '已部署模板停止', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('6_8', '已部署模板卸载', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('6_9', '已部署模板删除', '应用模板');
+      INSERT INTO `policy_menu` VALUES ('7_1', '创建任务', '任务管理');
+      INSERT INTO `policy_menu` VALUES ('7_2', '更新任务', '任务管理');
+      INSERT INTO `policy_menu` VALUES ('7_3', '删除任务', '任务管理');
+      INSERT INTO `policy_menu` VALUES ('8_1', '创建镜像', '镜像仓库');
+      INSERT INTO `policy_menu` VALUES ('8_2', '删除镜像', '镜像仓库');
+      INSERT INTO `policy_menu` VALUES ('9_1', '创建构建', '持续集成');
+      INSERT INTO `policy_menu` VALUES ('9_2', '触发构建', '持续集成');
+      INSERT INTO `policy_menu` VALUES ('9_3', '删除构建', '持续集成');
+      INSERT INTO `policy_menu` VALUES ('11_1', '创建存储', '存储管理');
+      INSERT INTO `policy_menu` VALUES ('11_2', '删除存储', '存储管理');
+
+
+      -- ----------------------------
+      -- Table structure for `role`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `role`;
+      CREATE TABLE `role` (
+        `id` varchar(100) NOT NULL,
+        `name` varchar(100) DEFAULT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of role
+      -- ----------------------------
+      INSERT INTO `role` VALUES ('1', '管理员');
+      INSERT INTO `role` VALUES ('2', '运维人员');
+      INSERT INTO `role` VALUES ('3', '测试/开发');
+      INSERT INTO `role` VALUES ('4', '门户');
+
+      -- ----------------------------
+      -- Table structure for `role_menu_mapping`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `role_menu_mapping`;
+      CREATE TABLE `role_menu_mapping` (
+        `menu_id` varchar(100) NOT NULL,
+        `role_id` varchar(100) NOT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of role_menu_mapping
+      -- ----------------------------
+      INSERT INTO `role_menu_mapping` VALUES ('3_1', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('3_2', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('3_3', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('3_4', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('3_5', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('3_6', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('3_7', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('3_8', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('4_1', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('4_2', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('4_3', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('4_4', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('4_5', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_1', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_10', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_11', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_12', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_13', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_14', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_15', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_16', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_17', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_18', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_19', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_2', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_3', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_4', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_5', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_6', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_7', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_8', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('5_9', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_1', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_10', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_2', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_3', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_4', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_5', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_6', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_7', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_8', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('6_9', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('8_1', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('8_2', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('9_1', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('9_2', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('9_3', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_1', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_10', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_11', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_12', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_13', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_14', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_15', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_2', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_3', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_4', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_5', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_6', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_7', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_8', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('10_9', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('11_1', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('11_2', '1');
+      INSERT INTO `role_menu_mapping` VALUES ('3_1', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('3_2', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('3_3', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('3_4', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('3_5', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('3_6', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('3_7', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('3_8', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('4_1', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('4_2', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('4_3', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('4_4', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('4_5', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_1', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_10', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_11', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_12', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_13', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_14', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_15', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_16', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_17', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_18', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_19', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_2', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_3', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_4', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_5', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_6', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_7', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_8', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('5_9', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_1', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_10', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_2', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_3', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_4', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_5', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_6', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_7', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_8', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('6_9', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('8_1', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('8_2', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('9_1', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('9_2', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('9_3', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_1', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_10', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_11', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_12', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_13', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_14', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_15', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_2', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_3', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_4', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_5', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_6', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_7', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_8', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('10_9', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('11_1', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('11_2', '2');
+      INSERT INTO `role_menu_mapping` VALUES ('2_1', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('2_2', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('2_3', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('2_4', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_1', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_10', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_11', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_12', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_13', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_14', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_15', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_16', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_17', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_18', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_19', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_2', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_3', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_4', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_5', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_6', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_7', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_8', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('5_9', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_1', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_10', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_2', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_3', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_4', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_5', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_6', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_7', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_8', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('6_9', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('8_1', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('8_2', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('9_1', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('9_2', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('9_3', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_1', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_10', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_11', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_12', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_13', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_14', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_15', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_2', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_3', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_4', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_5', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_6', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_7', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_8', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('10_9', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('11_1', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('11_2', '3');
+      INSERT INTO `role_menu_mapping` VALUES ('4_1', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('4_2', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('4_3', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('4_4', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('4_5', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_1', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_10', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_11', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_12', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_13', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_14', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_15', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_16', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_17', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_18', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_19', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_2', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_3', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_4', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_5', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_6', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_7', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_8', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('5_9', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_1', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_10', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_2', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_3', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_4', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_5', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_6', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_7', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_8', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('6_9', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('8_1', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('8_2', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('9_1', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('9_2', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('9_3', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_1', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_10', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_11', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_12', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_13', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_14', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_15', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_2', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_3', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_4', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_5', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_6', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_7', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_8', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('10_9', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('11_1', '4');
+      INSERT INTO `role_menu_mapping` VALUES ('11_2', '4');
+
+      -- ----------------------------
+      -- Table structure for `role_policy_infomapping`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `role_policy_infomapping`;
+      CREATE TABLE `role_policy_infomapping` (
+        `role_id` bigint(20) NOT NULL,
+        `page_id` bigint(20) NOT NULL,
+        PRIMARY KEY (`role_id`,`page_id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of role_policy_infomapping
+      -- ----------------------------
+      INSERT INTO `role_policy_infomapping` VALUES ('1', '1');
+      INSERT INTO `role_policy_infomapping` VALUES ('1', '3');
+      INSERT INTO `role_policy_infomapping` VALUES ('1', '4');
+      INSERT INTO `role_policy_infomapping` VALUES ('1', '5');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('1', '6');
+      INSERT INTO `role_policy_infomapping` VALUES ('1', '8');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('1', '9');
+      INSERT INTO `role_policy_infomapping` VALUES ('1', '10');
+      INSERT INTO `role_policy_infomapping` VALUES ('1', '11');
+      INSERT INTO `role_policy_infomapping` VALUES ('1', '15');
+      INSERT INTO `role_policy_infomapping` VALUES ('2', '1');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('2', '2');
+      INSERT INTO `role_policy_infomapping` VALUES ('2', '3');
+      INSERT INTO `role_policy_infomapping` VALUES ('2', '4');
+      INSERT INTO `role_policy_infomapping` VALUES ('2', '5');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('2', '6');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('2', '7');
+      INSERT INTO `role_policy_infomapping` VALUES ('2', '8');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('2', '9');
+      INSERT INTO `role_policy_infomapping` VALUES ('2', '10');
+      INSERT INTO `role_policy_infomapping` VALUES ('2', '11');
+      INSERT INTO `role_policy_infomapping` VALUES ('2', '15');
+      INSERT INTO `role_policy_infomapping` VALUES ('3', '1');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('3', '2');
+      INSERT INTO `role_policy_infomapping` VALUES ('3', '5');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('3', '6');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('3', '7');
+      INSERT INTO `role_policy_infomapping` VALUES ('3', '8');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('3', '9');
+      INSERT INTO `role_policy_infomapping` VALUES ('3', '10');
+      INSERT INTO `role_policy_infomapping` VALUES ('3', '11');
+      INSERT INTO `role_policy_infomapping` VALUES ('4', '1');
+      INSERT INTO `role_policy_infomapping` VALUES ('4', '4');
+      INSERT INTO `role_policy_infomapping` VALUES ('4', '5');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('4', '6');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('4', '7');
+      INSERT INTO `role_policy_infomapping` VALUES ('4', '8');
+      -- INSERT INTO `role_policy_infomapping` VALUES ('4', '9');
+      INSERT INTO `role_policy_infomapping` VALUES ('4', '10');
+      INSERT INTO `role_policy_infomapping` VALUES ('4', '11');
+      INSERT INTO `role_policy_infomapping` VALUES ('4', '15');
+
+      -- ----------------------------
+      -- Table structure for `sequence`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `sequence`;
+      CREATE TABLE `sequence` (
+        `name` varchar(50) NOT NULL,
+        `current_value` int(11) NOT NULL,
+        `increment` int(11) NOT NULL DEFAULT '1',
+        PRIMARY KEY (`name`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of sequence
+      -- ----------------------------
+      INSERT INTO `sequence` VALUES ('warn_category_id', '1000000001', '1');
+
+      -- ----------------------------
+      -- Table structure for `task`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `task`;
+      CREATE TABLE `task` (
+        `appname` varchar(20) NOT NULL COMMENT '任务和创建应用的名称',
+        `repType` varchar(10) DEFAULT NULL COMMENT '远程仓库类型',
+        `repBranch` varchar(20) DEFAULT 'master' COMMENT '远程仓库分支',
+        `repurl` varchar(10000) DEFAULT NULL COMMENT '远程仓库地址',
+        `repUsername` varchar(20) DEFAULT NULL COMMENT '远程仓库用户名',
+        `repPassword` varchar(100) DEFAULT NULL COMMENT '远程仓库密码',
+        `namespace` varchar(20) NOT NULL COMMENT '应用创建的命名空间',
+        `status` varchar(10) NOT NULL COMMENT '任务执行的状态',
+        `envConfig` varchar(10000) DEFAULT NULL COMMENT '自定义环境变量',
+        `username` varchar(50) NOT NULL,
+        `buildType` varchar(50) NOT NULL DEFAULT 'resource_registry' COMMENT '构建类型',
+        `warName` varchar(50) DEFAULT NULL COMMENT 'war包名称',
+        `buildLevel` varchar(50) NOT NULL DEFAULT 'level_image' COMMENT '构建级别：镜像level_image或者应用level_app',
+        `configType` varchar(50) NOT NULL DEFAULT 'default_config' COMMENT '配置：默认配置default_config或者自定义配置custom_config',
+        `instanceNum` int(11) DEFAULT NULL COMMENT '实例个数',
+        `requestCpu` int(11) DEFAULT NULL,
+        `limitCpu` int(11) DEFAULT NULL,
+        `requestMemory` int(11) DEFAULT NULL,
+        `limitMemory` int(11) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Table structure for `template_apps_info`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `template_apps_info`;
+      CREATE TABLE `template_apps_info` (
+        `id` varchar(50) NOT NULL COMMENT 'ID',
+        `namespace` varchar(100) NOT NULL COMMENT '命名空间',
+        `templatename` varchar(100) NOT NULL COMMENT '模板名称',
+        `environment` varchar(50) DEFAULT NULL COMMENT '环境',
+        `appnames` varchar(1000) DEFAULT NULL COMMENT '应用名称',
+        `updatetime` datetime DEFAULT NULL COMMENT '更新时间',
+        `appstate` varchar(2) DEFAULT NULL COMMENT '应用状态',
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+      -- ----------------------------
+      -- Table structure for `user_relationship`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `user_relationship`;
+      CREATE TABLE `user_relationship` (
+        `user_id` bigint(20) NOT NULL,
+        `father_id` bigint(20) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of user_relationship
+      -- ----------------------------
+      INSERT INTO `user_relationship` VALUES ('11', '1');
+      INSERT INTO `user_relationship` VALUES ('13', '1');
+      INSERT INTO `user_relationship` VALUES ('15', '1');
+      INSERT INTO `user_relationship` VALUES ('17', '1');
+      INSERT INTO `user_relationship` VALUES ('19', '1');
+      INSERT INTO `user_relationship` VALUES ('21', '1');
+      INSERT INTO `user_relationship` VALUES ('23', '1');
+      INSERT INTO `user_relationship` VALUES ('25', '1');
+      INSERT INTO `user_relationship` VALUES ('27', '1');
+      INSERT INTO `user_relationship` VALUES ('29', '1');
+      INSERT INTO `user_relationship` VALUES ('31', '1');
+      INSERT INTO `user_relationship` VALUES ('33', '1');
+      INSERT INTO `user_relationship` VALUES ('35', '1');
+      INSERT INTO `user_relationship` VALUES ('37', '1');
+      INSERT INTO `user_relationship` VALUES ('39', '1');
+      INSERT INTO `user_relationship` VALUES ('41', '1');
+      INSERT INTO `user_relationship` VALUES ('43', '1');
+      INSERT INTO `user_relationship` VALUES ('45', '1');
+      INSERT INTO `user_relationship` VALUES ('47', '1');
+      INSERT INTO `user_relationship` VALUES ('49', '1');
+      INSERT INTO `user_relationship` VALUES ('53', '21');
+      INSERT INTO `user_relationship` VALUES ('57', '21');
+      INSERT INTO `user_relationship` VALUES ('59', '21');
+      INSERT INTO `user_relationship` VALUES ('61', '21');
+      INSERT INTO `user_relationship` VALUES ('67', '21');
+      INSERT INTO `user_relationship` VALUES ('69', '21');
+      INSERT INTO `user_relationship` VALUES ('71', '21');
+      INSERT INTO `user_relationship` VALUES ('73', '21');
+      INSERT INTO `user_relationship` VALUES ('75', '21');
+      INSERT INTO `user_relationship` VALUES ('77', '21');
+      INSERT INTO `user_relationship` VALUES ('79', '21');
+
+      -- ----------------------------
+      -- Table structure for `user_role`
+      -- ----------------------------
+      DROP TABLE IF EXISTS `user_role`;
+      CREATE TABLE `user_role` (
+        `user_id` bigint(20) NOT NULL,
+        `role_id` varchar(100) NOT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      -- Records of user_role
+      -- ----------------------------
+      INSERT INTO `user_role` VALUES ('1', '1');
+      INSERT INTO `user_role` VALUES ('2', '1');
+
+
+      DROP TABLE IF EXISTS `app_scale`;
+      CREATE TABLE `app_scale` (
+        `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+        `APPNAME` varchar(50) NOT NULL,
+        `NAMESPACE` varchar(50) NOT NULL,
+        `AUTOMINPODS` INT DEFAULT NULL,
+        `AUTOMAXPODS` INT DEFAULT NULL,
+        `CPUPERCENTAGE` INT DEFAULT NULL,
+        `PLANMINPODS` INT DEFAULT NULL,
+        `PLANMAXPODS` INT DEFAULT NULL,
+        `PLANBEGINTIME` varchar(20) DEFAULT NULL,
+        `PLANENDTIME` varchar(20) DEFAULT NULL,
+        `TYPE` varchar(5) NOT NULL,
+        `ENABLE` varchar(1) NOT NULL,
+        `SELECTED` varchar(1) NOT NULL,
+        PRIMARY KEY (`ID`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+      CREATE TABLE `namespace` (
+        `id` bigint(20) NOT NULL AUTO_INCREMENT,
+        `name` varchar(100) NOT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      insert into namespace(id,name)values(1, 'default');
+      insert into namespace(id,name)values(2, 'kube-system');
+      insert into namespace(id,name)values(3, 'kube-public');
+      insert into namespace(id,name)values(4, 'kube-node-lease');
+
+      CREATE TABLE `user_namespace` (
+        `user_id` bigint(20) NOT NULL,
+        `namespace_id` bigint(20) NOT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+      insert into user_namespace values(1, 1);
+      insert into user_namespace values(1, 2);
+      insert into user_namespace values(1, 3);
+      insert into user_namespace values(1, 4);
+      insert into user_namespace values(2, 1);
+      insert into user_namespace values(2, 2);
+      insert into user_namespace values(2, 3);
+      insert into user_namespace values(2, 4);
+      -- ----------------------------
+      -- Function structure for `currval`
+      -- ----------------------------
+      DROP FUNCTION IF EXISTS `currval`;
+      DELIMITER ;;
+      CREATE DEFINER=`root`@`%` FUNCTION `currval`(seq_name VARCHAR(50)) RETURNS int(11)
+          READS SQL DATA
+          DETERMINISTIC
+      BEGIN
+      DECLARE VALUE INTEGER;
+      SET VALUE = 0;
+      SELECT current_value INTO VALUE FROM cz_sequence WHERE NAME = seq_name;
+      RETURN VALUE;
+      END
+      ;;
+      DELIMITER ;
+
+      -- ----------------------------
+      -- Function structure for `nextval`
+      -- ----------------------------
+      DROP FUNCTION IF EXISTS `nextval`;
+      DELIMITER ;;
+      CREATE DEFINER=`root`@`%` FUNCTION `nextval`(seq_name VARCHAR(50)) RETURNS int(11)
+          DETERMINISTIC
+      BEGIN
+      declare current integer;
+          set current = 0;
+          update cz_sequence t set t.current_value = t.current_value + 1 where t.name = seq_name;
+        select t.current_value into current from cz_sequence t where t.name = seq_name;
+          return current;
+      END
+      ;;
+      DELIMITER ;
+docker:
+  registry:
+    host: 10.126.2.56
+    port: 5000
+k8s:
+  host: 10.126.2.56
+  port: 6443
+  token: eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLW12dzhkIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJmMjk2MmNmOC0xMjQ2LTExZWEtOTNkMS0xYzIwZGI3YTU3MDMiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.fj8GX21Z29A-qS07sgSNA83s4Harx3zrb-tpkAkchAJLjWseu46rvTfwzyCiYt8FPs_ZBipwRBvwm-0mmTcerd46vnHUk177Ndt-kHjH4gqvJSHcTStgHiTuL0jK9KGIF_dBkxGPlQ7KezA64KW48JkWEgh9K_wvVrxFMfo6iaCy4uDfI7tevFLaA3fVuWejqyudtO0wx0I5eiamchcArLtCm_CzEQzuIPDqAeF4dtIk2JdPnTuzrM7Wj7h4Oi5M0JFRjpvqQLoAUx2t8J3blmL6y4Ldl6Im5IsHEFhrKOQSynT7YYmX-mS-JzJ9FyFKpL4yvnicafTNbUsI-eHLhA
+kubeapps:
+  nodePort: 31692
+dc:
+  image: sayaoailun/smartdc-arm64
+  imageTag: 2020.06.19-09.58-4e9ef44

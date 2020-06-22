@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-dc
+data:
+  application.properties: |
+    server.port=8080
+    server.context-path=/
+    logging.level.root=info
+
+    multipart.maxFileSize=150Mb
+    multipart.maxRequestSize=150Mb
+
+    dataSource.driverClassName=com.mysql.jdbc.Driver
+    dataSource.initialSize=1
+    dataSource.minIdle=1
+    dataSource.maxActive=100
+    dataSource.dbType=mysql
+    dataSource.url=jdbc:mysql://{{ .Release.Name }}-mysql:3306/{{ .Values.mysql.mysqlDatabase }}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&allowMultiQueries=true
+    dataSource.username=root
+    dataSource.password={{ .Values.mysql.mysqlRootPassword }}
+    dataSource.maxWaitMillis=60000
+    dataSource.timeBetweenEvictionRunsMillis=60000
+    dataSource.minEvictableIdleTimeMillis=300000
+    dataSource.validationQuery=SELECT 'x'
+
+    mybatis.mapper-locations=classpath*:com/digitalchina/**/*.xml
+    mybatis.dialect=mysql
+
+    # App响应时间
+    app.response.time=60
+    # 线程池大小
+    thread_pool_size=20
+
+    monitor.threadpool.size=20
+
+    #邮件服务器信息
+    email.smtp=smtp.163.com
+    email.password=huqigang123
+    email.from=dcitsmonitor@163.com
+    registryUrl={{ .Values.docker.registry.host }}:{{ .Values.docker.registry.port }}
+
+    k8s_master=https://{{ .Values.k8s.host }}:{{ .Values.k8s.port }}
+    k8s_metrics_path=/apis/metrics.k8s.io/v1beta1
+    k8s_ip=http://{{ .Values.k8s.host }}
+    k8s_admin=dev
+    k8s_passwd=dev
+    k8s_token={{ .Values.k8s.token }}
+    kubeapps-nodePort={{ .Values.kubeapps.nodePort }}
+    kubeapps-token=Bearer {{ .Values.k8s.token }}
+
+    #配置文件上传大小限制
+    spring.http.multipart.max-file-size=1000MB
+    spring.http.multipart.max-request-size=1000MB
+    #镜像仓库地址
+    image_registry=http://{{ .Values.docker.registry.host }}:{{ .Values.docker.registry.port }}/v2/
+    #管理员用户名
+    admin_username=dev
+
+    domain.name=.dc-ingress

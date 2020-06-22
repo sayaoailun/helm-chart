@@ -1,0 +1,14 @@
+apiVersion: v1
+appVersion: 2.8.4e9ef44
+description: 基于K8S的容器云平台，集成了Helm功能
+engine: gotpl
+home: http://prod.dcits.com/list/3/
+icon: https://sayaoailun.github.io/website/logo/DC/logo.png
+keywords:
+- Kubernetes
+- cloud
+maintainers:
+- email: guojwe@dcits.com
+  name: guojwe
+name: dc
+version: 1.0.0

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-dc
+  labels:
+    k8s-app: {{ .Release.Name }}-dc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: {{ .Release.Name }}-dc
+  template:
+    metadata:
+      labels:
+        k8s-app: {{ .Release.Name }}-dc
+        svc: {{ .Release.Name }}-dc
+    spec:
+      containers:
+      - name: dc
+        image: {{ .Values.dc.image }}:{{ .Values.dc.imageTag }}
+        resources:
+          requests:
+            memory: "2048Mi"
+            cpu: "1000m"
+          limits:
+            memory: "2048Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8080
+          name: dc
+        volumeMounts:
+        - name: dc-config
+          mountPath: /dc-config
+        readinessProbe:
+          httpGet:
+            path: /
+            port: dc
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 6
+      volumes:
+      - name: dc-config
+        configMap:
+          name: {{ .Release.Name }}-dc
