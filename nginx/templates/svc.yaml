@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    k8s-app: {{ .Release.Name }}
+spec:
+  type: NodePort
+  ports:
+  - name: nginx
+    port: 80
+    targetPort: nginx
+  selector:
+    k8s-app: {{ .Release.Name }}
+    svc: {{ .Release.Name }}

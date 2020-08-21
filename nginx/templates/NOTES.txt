@@ -1,0 +1,9 @@
+
+
+访问地址获取方式
+
+通过命令行获取
+
+export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ .Release.Name }})
+export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+echo "URL: http://$NODE_IP:$NODE_PORT"

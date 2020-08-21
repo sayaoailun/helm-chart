@@ -1,0 +1,19 @@
+# x86
+# nodeSelector:
+#   kubernetes.io/arch: amd64
+#   kubernetes.io/os: linux
+# image: nginx
+# imageTag: 1.17.7
+
+# 龙芯
+# nodeSelector:
+#   kubernetes.io/arch: mips64le
+#   kubernetes.io/os: linux
+# image: loongnixk8s/nginx
+# imageTag: 1.17.7
+
+nodeSelector:
+  kubernetes.io/arch: amd64
+  kubernetes.io/os: linux
+image: nginx
+imageTag: 1.17.7

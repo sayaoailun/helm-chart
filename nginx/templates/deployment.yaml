@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    k8s-app: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        k8s-app: {{ .Release.Name }}
+        svc: {{ .Release.Name }}
+    spec:
+      nodeSelector: {{- include "nginx.tplValue" (dict "value" .Values.nodeSelector "context" $) | nindent 8 }}
+      containers:
+      - name: nginx
+        image: {{ .Values.image }}:{{ .Values.imageTag }}
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "1000m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 80
+          name: nginx
+        readinessProbe:
+          httpGet:
+            path: /
+            port: nginx
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 6
